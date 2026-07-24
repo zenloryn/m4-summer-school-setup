@@ -2,38 +2,38 @@
 # setup.sh
 set -e
 
-# 1) uv 설치 (이미 있으면 스킵)
+# 1) Install uv if missing
 if ! command -v uv &> /dev/null; then
-    echo "uv 설치 중..."
+    echo "Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
     export PATH="$HOME/.local/bin:$PATH"
 fi
 uv --version
 
-# 2) pyproject.toml 다운로드 (이미 있으면 스킵 — 폴더 하나만 재사용하는 운영 방식이라
-#    이 시점에 파일이 있다면 그건 100% 이전 실행으로 생긴 것)
+# 2) Download pyproject.toml if missing (this folder is reused as-is for the whole
+#    course, so if the file already exists here, it was created by a previous run)
 if [ ! -f "pyproject.toml" ]; then
     curl -fsSL https://raw.githubusercontent.com/zenloryn/m4-summer-school-setup/main/pyproject.toml -o pyproject.toml
 fi
 
-# 3) 설치 (requires-python == 3.11.* 고정 덕분에 학생 PC의 기존 파이썬 버전과 무관하게
-#    .venv 안에는 항상 3.11이 격리되어 설치됨)
+# 3) Install dependencies (requires-python == 3.11.* pins the venv to 3.11
+#    regardless of whatever Python is already on the student's machine)
 if ! uv sync; then
-    echo "⚠️  의존성 설치 실패 (uv sync). fork 브랜치 접근이나 네트워크 상태를 확인하고 스크립트를 다시 실행하세요."
+    echo "[WARN] Dependency install failed (uv sync). Check network access to the fork branch and try again."
     exit 1
 fi
 
-# 4) MIMIC-IV demo 데이터 초기화
+# 4) Initialize MIMIC-IV demo dataset
 if ! uv run m4 init mimic-iv-demo; then
-    echo "⚠️  MIMIC-IV demo 데이터 초기화 실패. 네트워크 연결을 확인하고 스크립트를 다시 실행하세요."
+    echo "[WARN] MIMIC-IV demo data initialization failed. Check your network connection and try again."
     exit 1
 fi
 
-# 5) Claude Desktop 연동
+# 5) Connect to Claude Desktop
 if uv run m4 config claude --skills; then
-    echo "✅ 완료. Claude Desktop을 완전히 종료했다가 재시작하세요."
+    echo "[OK] Setup complete. Fully quit and restart Claude Desktop."
 else
-    echo "⚠️  Claude Desktop 설정 파일을 찾지 못했습니다."
-    echo "   -> Claude Desktop을 설치하고 한 번 실행한 뒤, 이 스크립트를 다시 실행하세요."
-    echo "   -> 다운로드: https://claude.ai/download"
+    echo "[WARN] Could not find the Claude Desktop config file."
+    echo "  -> Install Claude Desktop, open it at least once, then run this script again."
+    echo "  -> Download: https://claude.ai/download"
 fi
