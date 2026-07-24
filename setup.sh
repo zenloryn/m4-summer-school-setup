@@ -16,7 +16,8 @@ if [ ! -f "pyproject.toml" ]; then
     curl -fsSL https://raw.githubusercontent.com/zenloryn/m4-summer-school-setup/main/pyproject.toml -o pyproject.toml
 fi
 
-# 3) 설치
+# 3) 설치 (requires-python == 3.11.* 고정 덕분에 학생 PC의 기존 파이썬 버전과 무관하게
+#    .venv 안에는 항상 3.11이 격리되어 설치됨)
 if ! uv sync; then
     echo "⚠️  의존성 설치 실패 (uv sync). fork 브랜치 접근이나 네트워크 상태를 확인하고 스크립트를 다시 실행하세요."
     exit 1

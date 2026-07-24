@@ -1,7 +1,7 @@
 [project]
 name = "m4-research"
 version = "0.1.0"
-requires-python = ">=3.10"
+requires-python = "==3.11.*"
 dependencies = ["m4-infra"]
 
 [tool.uv.sources]
