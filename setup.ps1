@@ -1,6 +1,16 @@
 # setup.ps1
 $ErrorActionPreference = "Stop"
 
+# 0) Pre-checks — path length and free disk space
+$currentPath = (Get-Location).Path
+if ($currentPath.Length -gt 100) {
+    Write-Host "[WARN] Current folder path is long ($($currentPath.Length) chars). If you hit a 'path too long' error later, move to a shorter path like C:\m4-research and retry."
+}
+$freeGB = (Get-PSDrive -Name ($currentPath.Substring(0,1))).Free / 1GB
+if ($freeGB -lt 2) {
+    Write-Host "[WARN] Less than 2GB free disk space. Free up space before continuing."
+}
+
 # 1) Install uv if missing
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     Write-Host "Installing uv..."
@@ -20,11 +30,13 @@ if (-not (Test-Path "pyproject.toml")) {
 uv sync
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
-    Write-Host "[WARN] Dependency install failed (uv sync). Check network access to the fork branch and try again."
+    Write-Host "[WARN] Dependency install failed (uv sync)."
+    Write-Host "  -> Check network access to the fork branch and try again."
     exit 1
 }
 
 # 4) Initialize MIMIC-IV demo dataset
+Write-Host "Downloading MIMIC-IV demo data - this can take a few minutes, this is normal."
 uv run m4 init mimic-iv-demo
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
