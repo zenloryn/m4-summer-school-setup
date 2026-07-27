@@ -1,0 +1,11 @@
+{
+  "name": "cvd",
+  "description": "Custom cardiovascular disease (CVD) risk factor dataset",
+  "primary_verification_table": "cvd",
+  "schema_mapping": {
+    "": "main"
+  },
+  "modalities": [
+    "TABULAR"
+  ]
+}
