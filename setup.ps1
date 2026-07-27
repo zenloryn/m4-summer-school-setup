@@ -44,7 +44,24 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 5) Connect to Claude Desktop (includes the Windows MSIX path-detection patch)
+# 5) Download cvd custom dataset definition (skip if already present).
+#    m4_data\datasets already exists at this point (created automatically
+#    during step 4), so no separate mkdir is needed. This only registers
+#    the "cvd" dataset with m4 — converting the student-provided
+#    cvd.csv.gz into DuckDB (uv run m4 init cvd --src ...) is done later
+#    in class, not by this script.
+$cvdJsonPath = "m4_data\datasets\cvd.json"
+if (-not (Test-Path $cvdJsonPath)) {
+    try {
+        irm https://raw.githubusercontent.com/zenloryn/m4-summer-school-setup/main/cvd.json -OutFile $cvdJsonPath
+    } catch {
+        Write-Host ""
+        Write-Host "[WARN] cvd.json download failed. Check network access and try again."
+        exit 1
+    }
+}
+
+# 6) Connect to Claude Desktop (includes the Windows MSIX path-detection patch)
 uv run m4 config claude --skills
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
