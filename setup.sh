@@ -13,6 +13,20 @@ else
     echo "[WARN] Could not check free disk space. Continuing anyway."
 fi
 
+# 0.5) Pre-check — git must be installed (uv shells out to system git for the
+#      fork dependency below; uv cannot install git itself)
+if ! command -v git &> /dev/null; then
+    echo ""
+    echo "[WARN] Git is not installed."
+    if [ "$(uname)" = "Darwin" ]; then
+        echo "  -> Run: xcode-select --install"
+        echo "     A popup will appear — click Install, wait for it to finish, then re-run this script."
+    else
+        echo "  -> Install git for your distribution (e.g. sudo apt install git), then re-run this script."
+    fi
+    exit 1
+fi
+
 # 1) Install uv if missing
 if ! command -v uv &> /dev/null; then
     echo "Installing uv..."

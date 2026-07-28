@@ -15,6 +15,15 @@ try {
     Write-Host "[WARN] Could not check free disk space. Continuing anyway."
 }
 
+# 0.5) Pre-check — git must be installed (uv shells out to system git for the
+#      fork dependency below; uv cannot install git itself)
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    Write-Host ""
+    Write-Host "[WARN] Git is not installed."
+    Write-Host "  -> Install it from https://git-scm.com/download/win, then re-run this script."
+    exit 1
+}
+
 # 1) Install uv if missing
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     Write-Host "Installing uv..."
