@@ -13,18 +13,16 @@ else
     echo "[WARN] Could not check free disk space. Continuing anyway."
 fi
 
-# 0.5) Pre-check — git must be installed (uv shells out to system git for the
-#      fork dependency below; uv cannot install git itself)
+# 0.5) Pre-check — git should be installed (uv shells out to system git for the
+#      fork dependency below). Warn only, don't block: if this check has a
+#      false negative, step 3 (uv sync) will still catch a real problem with
+#      its own specific message below.
 if ! command -v git &> /dev/null; then
-    echo ""
-    echo "[WARN] Git is not installed."
     if [ "$(uname)" = "Darwin" ]; then
-        echo "  -> Run: xcode-select --install"
-        echo "     A popup will appear — click Install, wait for it to finish, then re-run this script."
+        echo "[WARN] Git does not appear to be installed. If step 3 below fails, run 'xcode-select --install' and re-run this script."
     else
-        echo "  -> Install git for your distribution (e.g. sudo apt install git), then re-run this script."
+        echo "[WARN] Git does not appear to be installed. If step 3 below fails, install git for your distribution (e.g. sudo apt install git) and re-run this script."
     fi
-    exit 1
 fi
 
 # 1) Install uv if missing
@@ -53,7 +51,14 @@ fi
 #    regardless of whatever Python is already on the student's machine)
 if ! uv sync; then
     echo "[WARN] Dependency install failed (uv sync)."
-    if [ "$(uname)" = "Darwin" ]; then
+    if ! command -v git &> /dev/null; then
+        if [ "$(uname)" = "Darwin" ]; then
+            echo "  -> Git is not installed. Run: xcode-select --install"
+            echo "     A popup will appear — click Install, wait for it to finish, then re-run this script."
+        else
+            echo "  -> Git is not installed. Install git for your distribution (e.g. sudo apt install git), then re-run this script."
+        fi
+    elif [ "$(uname)" = "Darwin" ]; then
         if ! xcode-select -p &> /dev/null; then
             echo "  -> Xcode Command Line Tools not found. Run: xcode-select --install"
             echo "     Then wait for the install to finish and re-run this script."

@@ -15,13 +15,12 @@ try {
     Write-Host "[WARN] Could not check free disk space. Continuing anyway."
 }
 
-# 0.5) Pre-check — git must be installed (uv shells out to system git for the
-#      fork dependency below; uv cannot install git itself)
+# 0.5) Pre-check — git should be installed (uv shells out to system git for the
+#      fork dependency below). Warn only, don't block: if this check has a
+#      false negative, step 3 (uv sync) will still catch a real problem with
+#      its own specific message below.
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Host ""
-    Write-Host "[WARN] Git is not installed."
-    Write-Host "  -> Install it from https://git-scm.com/download/win, then re-run this script."
-    exit 1
+    Write-Host "[WARN] Git does not appear to be installed. If step 3 below fails, install it from https://git-scm.com/download/win and re-run this script."
 }
 
 # 1) Install uv if missing
@@ -55,7 +54,11 @@ uv sync
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host "[WARN] Dependency install failed (uv sync)."
-    Write-Host "  -> Check network access to the fork branch and try again."
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Host "  -> Git is not installed. Install it from https://git-scm.com/download/win, then re-run this script."
+    } else {
+        Write-Host "  -> Check network access to the fork branch and try again."
+    }
     exit 1
 }
 
