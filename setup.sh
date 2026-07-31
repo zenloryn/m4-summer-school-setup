@@ -15,7 +15,7 @@ fi
 
 # 0.5) Pre-check — git should be installed (uv shells out to system git for the
 #      fork dependency below). Warn only, don't block: if this check has a
-#      false negative, step 3 (uv sync) will still catch a real problem with
+#      false negative, step 3 (uv add) will still catch a real problem with
 #      its own specific message below.
 if ! command -v git &> /dev/null; then
     if [ "$(uname)" = "Darwin" ]; then
@@ -38,19 +38,19 @@ if ! command -v uv &> /dev/null; then
 fi
 uv --version
 
-# 2) Download pyproject.toml if missing (this folder is reused as-is for the whole
-#    course, so if the file already exists here, it was created by a previous run)
+# 2) Initialize uv project pinned to Python 3.11+ (skip if already initialized;
+#    this folder is reused as-is for the whole course)
 if [ ! -f "pyproject.toml" ]; then
-    if ! curl -fsSL https://raw.githubusercontent.com/zenloryn/m4-summer-school-setup/main/pyproject.toml -o pyproject.toml; then
-        echo "[WARN] pyproject.toml download failed. Check network access and try again."
+    if ! uv init --python 3.11; then
+        echo "[WARN] Project initialization failed (uv init). This may need to download Python 3.11 - check network access and try again."
         exit 1
     fi
 fi
 
-# 3) Install dependencies (requires-python == 3.11.* pins the venv to 3.11
-#    regardless of whatever Python is already on the student's machine)
-if ! uv sync; then
-    echo "[WARN] Dependency install failed (uv sync)."
+# 3) Install m4-infra from the course fork (uv add safely merges this into
+#    pyproject.toml/uv.lock — safe to re-run)
+if ! uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4_cmi.git"; then
+    echo "[WARN] Dependency install failed (uv add)."
     if ! command -v git &> /dev/null; then
         if [ "$(uname)" = "Darwin" ]; then
             echo "  -> Git is not installed. Run: xcode-select --install"
@@ -66,10 +66,10 @@ if ! uv sync; then
             echo "  -> openssl not found. Run: brew install openssl pkgconf"
             echo "     (if brew is missing, install it first from https://brew.sh)"
         else
-            echo "  -> Check network access to the fork branch and try again."
+            echo "  -> Check network access to the fork repository and try again."
         fi
     else
-        echo "  -> Check network access to the fork branch and try again."
+        echo "  -> Check network access to the fork repository and try again."
     fi
     exit 1
 fi
@@ -93,11 +93,6 @@ else
 fi
 
 # 6) Download cvd custom dataset definition (skip if already present).
-#    m4_data/datasets already exists at this point (created automatically
-#    during step 4), so no separate mkdir is needed. This only registers
-#    the "cvd" dataset with m4 — converting the student-provided
-#    cvd.csv.gz into DuckDB (uv run m4 init cvd --src ...) is done later
-#    in class, not by this script.
 #    Non-fatal on failure: Claude Desktop is already configured above, so a
 #    flaky network at this last step shouldn't block the rest of setup.
 CVD_JSON_PATH="m4_data/datasets/cvd.json"
