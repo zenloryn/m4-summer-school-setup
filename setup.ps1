@@ -49,7 +49,7 @@ if (-not (Test-Path "pyproject.toml")) {
 
 # 3) Install m4-infra from the course fork (uv add safely merges this into
 #    pyproject.toml/uv.lock — safe to re-run)
-uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4_cmi.git"
+uv add "m4-infra @ git+https://github.com/CMI-Laboratory/m4.git"
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host "[WARN] Dependency install failed (uv add)."
@@ -91,7 +91,7 @@ $cvdJsonPath = "m4_data\datasets\cvd.json"
 if (-not (Test-Path $cvdJsonPath)) {
     New-Item -ItemType Directory -Path (Split-Path $cvdJsonPath) -Force | Out-Null
     try {
-        irm https://raw.githubusercontent.com/zenloryn/m4-summer-school-setup/main/cvd.json -OutFile $cvdJsonPath
+        irm https://raw.githubusercontent.com/CMI-Laboratory/m4-summer-school-setup/main/cvd.json -OutFile $cvdJsonPath
     } catch {
         Write-Host ""
         Write-Host "[WARN] cvd.json download failed. Check network access and try again."
