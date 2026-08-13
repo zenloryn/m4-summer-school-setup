@@ -49,7 +49,7 @@ fi
 
 # 3) Install m4-infra from the course fork (uv add safely merges this into
 #    pyproject.toml/uv.lock — safe to re-run)
-if ! uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4_cmi.git"; then
+if ! uv add "m4-infra @ git+https://github.com/zenloryn/m4.git"; then
     echo "[WARN] Dependency install failed (uv add)."
     if ! command -v git &> /dev/null; then
         if [ "$(uname)" = "Darwin" ]; then
@@ -98,7 +98,7 @@ fi
 CVD_JSON_PATH="m4_data/datasets/cvd.json"
 if [ ! -f "$CVD_JSON_PATH" ]; then
     mkdir -p "$(dirname "$CVD_JSON_PATH")"
-    if ! curl -fsSL https://raw.githubusercontent.com/YujeeCatherine/m4-summer-school-setup/main/cvd.json -o "$CVD_JSON_PATH"; then
+    if ! curl -fsSL https://raw.githubusercontent.com/zenloryn/m4-summer-school-setup/main/cvd.json -o "$CVD_JSON_PATH"; then
         echo "[WARN] cvd.json download failed. Check network access and try again."
         echo "  -> This only affects the 'cvd' dataset used later in class; Claude Desktop setup above is unaffected."
     fi
