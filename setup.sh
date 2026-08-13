@@ -49,7 +49,7 @@ fi
 
 # 3) Install m4-infra from the course fork (uv add safely merges this into
 #    pyproject.toml/uv.lock — safe to re-run)
-if ! uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4.git"; then
+if ! uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4_cmi.git"; then
     echo "[WARN] Dependency install failed (uv add)."
     if ! command -v git &> /dev/null; then
         if [ "$(uname)" = "Darwin" ]; then

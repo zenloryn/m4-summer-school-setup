@@ -49,7 +49,7 @@ if (-not (Test-Path "pyproject.toml")) {
 
 # 3) Install m4-infra from the course fork (uv add safely merges this into
 #    pyproject.toml/uv.lock — safe to re-run)
-uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4.git"
+uv add "m4-infra @ git+https://github.com/YujeeCatherine/m4_cmi.git"
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
     Write-Host "[WARN] Dependency install failed (uv add)."
